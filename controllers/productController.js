@@ -23,9 +23,9 @@ export async function createProduct(req, res) {
       product: response,
     });
   } catch (error) {
-    console.error("Error creating Product: error");
+    console.error("Error creating Product:", error);
     res.status(500).json({
-      message: "Failed to create a  product",
+      message: "Failed to create a  product"
     });
   }
 }
@@ -37,6 +37,7 @@ export async function getProducts(req, res) {
       return res.json(products);
     } else {
       const products = await Product.find({ isAvailable: true });
+      console.log("Product is fetching")
       return res.json(products);
     }
   } catch (error) {
