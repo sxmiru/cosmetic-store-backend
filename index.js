@@ -14,6 +14,7 @@ app.use(bodyparser.json());
 
 app.use(cors());
 
+//Authenticaion
 app.use((req, res, next) => {
   const tokenValue = req.header("Authorization");
   if (tokenValue != null) {

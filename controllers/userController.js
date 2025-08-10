@@ -6,7 +6,7 @@ dotenv.config();
 
 export function createUser(req, res) {
   console.log(req);
-  //Authentication
+  //Authorization
   if (req.user == null) {
     res.status(401).json({
       message: "Please login to create a user",
@@ -18,6 +18,7 @@ export function createUser(req, res) {
     res.status(403).json({
       message: "Please login as an admin to create a user",
     });
+    return;
   }
 
   const passwordHash = bcrypt.hashSync(req.body.password, 10);
