@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import productRouter from "./routers/productRouter.js";
 import dotenv from "dotenv";
 import cors from 'cors'
+import orderRouter from "./routers/orderRouter.js";
 dotenv.config();
 
 const app = express();
@@ -46,6 +47,7 @@ mongoose
 
 app.use("/api/users", userRouter);
 app.use("/api/products", productRouter);
+app.use("/api/orders", orderRouter)
 
 app.get("/", (req, res) => {
   console.log(req);

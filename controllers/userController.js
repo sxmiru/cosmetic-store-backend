@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export function createUser(req, res) {
-  console.log(req);
+  console.log(req.user);//decoded token
   //Authorization
   if (req.user == null) {
     res.status(401).json({
