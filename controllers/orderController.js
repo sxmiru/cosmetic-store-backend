@@ -1,8 +1,8 @@
 import Order from '../models/order.js';
 import Product from '../models/product.js';
+import { isAdmin } from './userController.js';
 
 export async function createOrder(req,res){
-
 try{
 
     if(req.user == null){
@@ -62,7 +62,7 @@ try{
         {
             orderId: orderId,
             email: req.user.email,
-            name: req.user.firstname,
+            name: `${req.user.firstName} ${req.user.lastName}`,
             address: req.body.address,
             phone: req.body.phone,
             items: items,
@@ -86,6 +86,10 @@ try{
 
 export async function getOrders(req,res){
 
+    const page = parseInt(req.params.page) || 1;
+    const limit = parseInt(req.params.limit) || 10;
+
+
     if(req.user == null){
         res.status(401).json({message: "Please login to view orders"})
         return;
@@ -93,15 +97,55 @@ export async function getOrders(req,res){
 
     try{
         if(req.user.role == "admin"){
-            const orders = await Order.find().sort({date: -1});
-            res.json(orders);
+
+            const orderCount = await Order.countDocuments();
+            const totalpages = Math.ceil(orderCount / limit);
+
+            const orders = await Order.find().skip((page-1) * limit).limit(limit).sort({date: -1});
+            res.json(
+                {
+                    orders: orders,
+                    totalpages: totalpages
+                }
+            );
         }else{
-            const orders = await Order.find({email: req.user.email}).sort({date: -1});
-            res.json(orders);
+            const orderCount = await Order.countDocuments({email: req.user.email});
+            const totalpages = Math.ceil(orderCount / limit);
+            const orders = await Order.find({email: req.user.email}).skip((page-1) * limit).limit(limit).sort({date: -1});
+            res.json(
+                {
+                    orders: orders,
+                    totalpages: totalpages
+                }
+            );
         }
 
     }catch(error){
         console.error("Error fetching orders: ", error);
         res.status(500).json({message: "Failed to fetch products"});
+    }
+}
+
+export async function updateOrder(req,res){
+    if(isAdmin(req)){
+        const orderId = req.params.orderId;
+        const status = req.body.status;
+        const notes = req.body.notes;
+
+        await Order.findOneAndUpdate(
+            {orderId: orderId},
+            {status: status, notes: notes},
+            {new: true}
+        ).then(
+            (updatedOrder)=>{
+                res.json({
+                    message: "Order updated successfully",
+                    order: updatedOrder
+                })
+            }
+        )
+    }else{
+        res.status(401).json({message: "Unauthorized"});
+        return;
     }
 }
