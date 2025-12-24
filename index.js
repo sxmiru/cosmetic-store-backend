@@ -49,38 +49,6 @@ app.use("/api/users", userRouter);
 app.use("/api/products", productRouter);
 app.use("/api/orders", orderRouter)
 
-app.get("/", (req, res) => {
-  console.log(req);
-  res.json({
-    message: "This is a get request",
-  });
-  console.log("This is a get request");
-});
-
-app.post("/", (req, res) => {
-  console.log(req.body);
-  res.json({
-    message: "This is a post request",
-  });
-  console.log("This is a post request");
-});
-
-app.delete("/", (req, res) => {
-  console.log("This is a delete request");
-  res.json({
-    message: "This is a delete request",
-  });
-  console.log("This is a delete request");
-});
-
-app.put("/", (req, res) => {
-  console.log("This is a put request");
-  res.json({
-    message: "This is a put request",
-  });
-  console.log("This is a put request");
-});
-
 app.listen(5000, () => {
   console.log("server started");
 });
