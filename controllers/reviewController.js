@@ -16,6 +16,7 @@ export async function createReviews(req,res) {
             firstName: req.user.firstName,
             lastName: req.user.lastName,
             email: req.user.email,
+            images: req.body.images,
             rating: req.body.rating,
             comment: req.body.comment
         }
@@ -36,12 +37,29 @@ export async function createReviews(req,res) {
 
 export async function getReviews(req,res) {
     try{
-        const reviews = await Reviews.find();
-        res.json(reviews)
+        const reviews = await Reviews.find().sort({createdAt: -1});
+        res.json({
+            reviews: reviews
+        })
     }catch(error){
         console.error("Failed to fetch reviews", error)
         return res.status(500).json({
             message: "Failed to fetch reviews"
+        })
+    }
+}
+
+export async function getReviewsByProductId(req,res) {
+    try{
+        const productId = req.params.productId;
+        const reviews = await Reviews.find({productId: productId}).sort({createdAt: -1});
+        res.json({
+            reviews: reviews
+        })
+    }catch(error){
+        console.error("Failed to fetch review", error)
+        return res.status(500).json({
+            message: "Failed to fetch review"
         })
     }
 }
@@ -67,7 +85,7 @@ export async function deleteReview(req, res) {
 
         const isReviewOwner = review.email === user.email;
 
-        if (!isAdmin || !isReviewOwner) {
+        if (!isAdmin(req) && !isReviewOwner) {
             return res.status(403).json({
                 message: "You are not authorized to delete this review"
             });
@@ -112,7 +130,7 @@ export async function updateReview(req, res) {
 
         const isReviewOwner = review.email == user.email;
 
-        if(!isAdmin || !isReviewOwner){
+        if(!isAdmin(req) && !isReviewOwner){
             return res.status(403).json({
                 message: "You are not authorized to update this review"
             })
