@@ -36,10 +36,18 @@ export async function createReviews(req,res) {
 }
 
 export async function getReviews(req,res) {
+
+
+    const page = parseInt(req.params.page) || 1;
+    const limit = parseInt(req.params.limit) || 10;
+
     try{
-        const reviews = await Reviews.find().sort({createdAt: -1});
+        const orderCount = await Reviews.countDocuments();
+        const totalPages = Math.ceil(orderCount / limit);
+        const reviews = await Reviews.find().skip((page-1) * limit).limit(limit).sort({createdAt: -1});
         res.json({
-            reviews: reviews
+            reviews: reviews,
+            totalPages: totalPages
         })
     }catch(error){
         console.error("Failed to fetch reviews", error)
